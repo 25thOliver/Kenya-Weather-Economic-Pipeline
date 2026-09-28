@@ -1,6 +1,7 @@
 services:
   ingestion:
     build:
-      context: ./ingestion
+      context: .
+      dockerfile: ingestion/Dockerfile
     container_name: kenya_pipeline_ingestion
     restart: "no"
