@@ -75,6 +75,7 @@ def ingest_open_meteo(config):
         result = client.fetch_location(
             name=name,
             latitude=location["latitude"],
+            longitude=location["longitude"],
             variables=variables,
             start_date=start_date,
             end_date=end_date,
