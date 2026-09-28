@@ -79,7 +79,7 @@ class OpenMeteoClient:
         output_path = Path(output_directory)
         output_path.mkdir(
             parents=True,
-            exists_ok=True,
+            exist_ok=True,
         )
 
         timestamp = datetime.now(
