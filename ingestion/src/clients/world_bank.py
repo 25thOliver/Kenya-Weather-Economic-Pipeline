@@ -10,45 +10,58 @@ class WorldBankClient:
         self.country_code = country_code
 
     def fetch_indicators(self, indicator_codes: list[str]) -> dict:
-        indicators = ";".join(indicator_codes)
+        all_records = []
+        indicator_metadata = []
 
-        url = (
-            f"{self.base_url}/country/"
-            f"{self.country_code}/indicator/"
-            f"{indicators}"
-        )
-
-        params = {
-            "format": "json",
-            "per_page": 1000,
-        }
-
-        response = requests.get(
-            url,
-            params=params,
-            timeout=30,
-        )
-
-        response.raise_for_status()
-
-        payload = response.json()
-
-        if not isinstance(payload, list) or len(payload) != 2:
-            raise ValueError(
-                "Unexpected World Bank API response structure"
+        for indicator_code in indicator_codes:
+            url = (
+                f"{self.base_url}/country/"
+                f"{self.country_code}/indicator/"
+                f"{indicator_code}"
             )
 
-        metadata = payload[0]
-        records = payload[1]
+            params = {
+                "format": "json",
+                "per_page": 1000,
+            }
+
+            response = requests.get(
+                url,
+                params=params,
+                timeout=30,
+            )
+
+            response.raise_for_status()
+
+            payload = response.json()
+
+            if not isinstance(payload, list) or len(payload) != 2:
+                raise ValueError(
+                    f"Unexpected World Bank response for "
+                    f"{indicator_code}: {payload}"
+                )
+
+            metadata = payload[0]
+            records = payload[1]
+
+            indicator_metadata.append({
+                "indicator": indicator_code,
+                "metadata": metadata,
+                "request_url": response.url,
+            })
+
+            all_records.extend(records)
+
+            print(
+                f"  {indicator_code}: "
+                f"{len(records)} records"
+            )
 
         return {
-            "metadata": metadata,
-            "records": records,
+            "metadata": indicator_metadata,
+            "records": all_records,
             "request": {
-                "url": response.url,
-                "retrieved_at": datetime.now(
-                    timezone.utc
-                ).isoformat(),
+                "country": self.country_code,
             },
         }
 
