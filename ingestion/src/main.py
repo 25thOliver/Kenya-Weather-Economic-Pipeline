@@ -25,7 +25,7 @@ def ingest_world_bank(config):
 
     client = WorldBankClient(
         base_url=economic_config["base_url"],
-        country_code=economic_config["countyr_code"],
+        country_code=economic_config["country_code"],
     )
 
     data = client.fetch_indicators(
