@@ -88,7 +88,7 @@ class OpenMeteoClient:
 
         file_path = (
             output_path
-            / f"opene_meteo_{timestamp}.json"
+            / f"open_meteo_{timestamp}.json"
         )
 
         with file_path.open(
