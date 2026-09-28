@@ -1,0 +1,6 @@
+services:
+  ingestion:
+    build:
+      context: ./ingestion
+    container_name: kenya_pipeline_ingestion
+    restart: "no"
