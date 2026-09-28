@@ -1,0 +1,78 @@
+project:
+  name: kenya-economic-weather-pipeline
+  country: Kenya
+  country_code: KEN
+
+economic:
+  source: world_bank
+  base_url: https://api.worldbank.org/v2
+  country_code: KEN
+
+  indicators:
+    - code: NY.GDP.MKTP.CD
+      name: gdp_current_usd
+      description: GDP in current US dollars
+
+    - code: NY.GDP.MKTP.KD.ZG
+      name: gdp_growth
+      description: Annual GDP growth percentage
+
+    - code: SP.POP.TOTL
+      name: population
+      description: Total population
+
+    - code: FP.CPI.TOTL
+      name: consumer_price_index
+      description: Consumer price index
+
+    - code: SL.UEM.TOTL.ZS
+      name: unemployment_rate
+      description: Unemployment as percentage of total labor force
+
+    - code: NV.AGR.TOTL.ZS
+      name: agriculture_value_added
+      description: Agriculture value added as percentage of GDP
+
+    - code: EG.ELC.ACCS.ZS
+      name: electricity_access
+      description: Access to electricity as percentage of population
+
+    - code: IT.NET.USER.ZS
+      name: internet_usage
+      description: Individuals using the internet as percentage of population
+
+weather:
+  source: open_meteo
+  base_url: https://archive-api.open-meteo.com/v1/archive
+  timezone: Africa/Nairobi
+
+  variables:
+    - temperature_2m
+    - relative_humidity_2m
+    - precipitation
+    - wind_speed_10m
+
+  locations:
+    - name: Nairobi
+      latitude: -1.286389
+      longitude: 36.817223
+
+    - name: Mombasa
+      latitude: -4.043477
+      longitude: 39.668206
+
+    - name: Kisumu
+      latitude: -0.102210
+      longitude: 34.761710
+
+    - name: Nakuru
+      latitude: -0.303099
+      longitude: 36.080025
+
+    - name: Eldoret
+      latitude: 0.514277
+      longitude: 35.269779
+
+    - name: Garissa
+      latitude: -0.453229
+      longitude: 39.646098
