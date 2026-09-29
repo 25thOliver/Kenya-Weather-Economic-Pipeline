@@ -9,15 +9,18 @@ def round_value(value, decimals=2):
 
     return round(value, decimals)
 
+
 def transform_weather(
-        inputh_path: str,
-        output_path: str,
+    input_path: str,
+    output_path: str,
 ):
-    input_file = Path(inputh_path)
+    input_file = Path(input_path)
     output_file = Path(output_path)
 
-
-    with input_file.open("r", encoding="utf-8") as file:
+    with input_file.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
         locations = json.load(file)
 
     daily = defaultdict(
@@ -30,118 +33,106 @@ def transform_weather(
     )
 
     for location_data in locations:
+
         location = location_data["location"]["name"]
+
         hourly = location_data["data"]["hourly"]
 
         times = hourly["time"]
-        temperatures = hourly.get("temperature_2m", [])
-        rainfall = hourly.get("precipitation", [])
-        humidity = hourly.get(
-            "relative_humidity_2m", []
-        )
-        wind_speed = hourly.get(
-            "wind_speed_10m", []
-        )
+        temperatures = hourly["temperature_2m"]
+        rainfall = hourly["precipitation"]
+        humidity = hourly["relative_humidity_2m"]
+        wind_speed = hourly["wind_speed_10m"]
 
         for index, timestamp in enumerate(times):
+
             date = timestamp[:10]
 
             key = (date, location)
 
-            if index < len(temperatures):
-                value = temperatures[index]
-                if value is not None:
-                    daily[key]["temperatures"].append(
-                        value
-                    )
+            if temperatures[index] is not None:
+                daily[key]["temperatures"].append(
+                    temperatures[index]
+                )
 
-            if index < len(rainfall):
-                value = rainfall[index]
-                if value is not None:
-                    daily[key]["rainfall"].append(
-                        value
-                    )
+            if rainfall[index] is not None:
+                daily[key]["rainfall"].append(
+                    rainfall[index]
+                )
 
-            if index < len(humidity):
-                value = humidity[index]
-                if value is not None:
-                    daily[key]["humidity"].append(
-                        value
-                    )
+            if humidity[index] is not None:
+                daily[key]["humidity"].append(
+                    humidity[index]
+                )
 
-            if index < len(humidity):
-                value = wind_speed[index]
-                if value is not None:
-                    daily[key]["wind_speed"].append(
-                        value
-                    )
+            if wind_speed[index] is not None:
+                daily[key]["wind_speed"].append(
+                    wind_speed[index]
+                )
 
-        transformed = []
+    transformed = []
 
-        for (date, location), values in sorted(
-            daily.items()
-        ):
-            temperatures = values["temperatures"]
-            rainfall = values["rainfall"]
-            humidity = values["humidity"]
-            wind_speed = values["wind_speed"]
+    for (date, location), values in sorted(
+        daily.items()
+    ):
 
-            transformed.append(
-                {
-                    "date": date,
-                    "location": location,
-                    "temperature_avg": round_value(
-                        sum(temperatures)
-                        / len(temperatures)
-                        if temperatures
-                        else None
-                    ),
-                    "temperature_min": round_value(
-                        min(temperatures)
-                        if temperatures
-                        else None
-                    ),
-                    "temperature_max": round_value(
-                        max(temperatures)
-                        if temperatures
-                        else None
-                    ),
-                    "rainfall": round_value(
-                        sum(rainfall)
-                        ),
-                    "humidity_avg": round_value(
-                        (
-                            sum(humidity)
-                            / len(humidity)
-                            if humidity
-                            else None
-                        )
-                    ),
-                    "wind_speed_avg":round_value(
-                        (
-                            sum(wind_speed)
-                            / len(wind_speed)
-                            if wind_speed
-                            else None
-                        )
-                    ),
-                }
-            )
+        temperatures = values["temperatures"]
+        rainfall = values["rainfall"]
+        humidity = values["humidity"]
+        wind_speed = values["wind_speed"]
 
-        output_file.parent.mkdir(
-            parents=True,
-            exist_ok=True,
+        transformed.append(
+            {
+                "date": date,
+                "location": location,
+                "temperature_avg": round_value(
+                    sum(temperatures)
+                    / len(temperatures)
+                    if temperatures
+                    else None
+                ),
+                "temperature_min": round_value(
+                    min(temperatures)
+                    if temperatures
+                    else None
+                ),
+                "temperature_max": round_value(
+                    max(temperatures)
+                    if temperatures
+                    else None
+                ),
+                "rainfall": round_value(
+                    sum(rainfall)
+                ),
+                "humidity_avg": round_value(
+                    sum(humidity)
+                    / len(humidity)
+                    if humidity
+                    else None
+                ),
+                "wind_speed_avg": round_value(
+                    sum(wind_speed)
+                    / len(wind_speed)
+                    if wind_speed
+                    else None
+                ),
+            }
         )
 
-        with output_file.open(
-            "w",
-            encoding="utf-8",
-        ) as file:
-            json.dump(
-                transformed,
-                file,
-                indent=2,
-                ensure_ascii=False,
-            )
+    output_file.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
-        return output_file
+    with output_file.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            transformed,
+            file,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return output_file
