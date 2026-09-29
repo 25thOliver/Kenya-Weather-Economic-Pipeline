@@ -43,5 +43,24 @@ services:
       - minio_data:/data
 
 
+  postgres:
+    image: postgres:16
+
+    container_name: kenya_pipeline_postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: kenya_intelligence
+      POSTGRES_USER: pipeline
+      POSTGRES_PASSWORD: pipeline123
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
 volumes:
   minio_data:
