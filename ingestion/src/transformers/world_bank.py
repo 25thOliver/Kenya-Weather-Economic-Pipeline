@@ -3,7 +3,7 @@ import json
 
 def transform_world_bank(
         input_path: str,
-        outputh_path: str,
+        output_path: str,
 ):
 
     input_file = Path(input_path)
