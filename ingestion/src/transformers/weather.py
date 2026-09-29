@@ -12,7 +12,7 @@ def transform_weather(
 
 
     with input_file.open("r", encoding="utf-8") as file:
-        locations = json.local(file)
+        locations = json.load(file)
 
     daily = defaultdict(
         lambda: {
