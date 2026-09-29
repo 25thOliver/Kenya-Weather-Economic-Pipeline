@@ -3,6 +3,12 @@ from pathlib import Path
 import json
 
 
+def round_value(value, decimals=2):
+    if value is None:
+        return None
+
+    return round(value, decimals)
+
 def transform_weather(
         inputh_path: str,
         output_path: str,
@@ -84,34 +90,40 @@ def transform_weather(
                 {
                     "date": date,
                     "location": location,
-                    "temperature_avg": (
+                    "temperature_avg": round_value(
                         sum(temperatures)
                         / len(temperatures)
                         if temperatures
                         else None
                     ),
-                    "temperature_min": (
+                    "temperature_min": round_value(
                         min(temperatures)
                         if temperatures
                         else None
                     ),
-                    "temperature_max": (
+                    "temperature_max": round_value(
                         max(temperatures)
                         if temperatures
                         else None
                     ),
-                    "rainfall": sum(rainfall),
-                    "humidity_avg": (
-                        sum(humidity)
-                        / len(humidity)
-                        if humidity
-                        else None
+                    "rainfall": round_value(
+                        sum(rainfall)
+                        ),
+                    "humidity_avg": round_value(
+                        (
+                            sum(humidity)
+                            / len(humidity)
+                            if humidity
+                            else None
+                        )
                     ),
-                    "wind_speed_avg": (
-                        sum(wind_speed)
-                        / len(wind_speed)
-                        if wind_speed
-                        else None
+                    "wind_speed_avg":round_value(
+                        (
+                            sum(wind_speed)
+                            / len(wind_speed)
+                            if wind_speed
+                            else None
+                        )
                     ),
                 }
             )
