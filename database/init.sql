@@ -4,7 +4,10 @@ CREATE TABLE IF NOT EXISTS economic_indicators (
     country VARCHAR(100) NOT NULL,
     indicator_code VARCHAR(50) NOT NULL,
     year INTEGER NOT NULL,
-    value DOUBLE PRECISION
+    value DOUBLE PRECISION,
+
+    CONSTRAINT uq_economic_indicator
+        UNIQUE (country_code, indicator_code, year)
 );
 
 CREATE TABLE IF NOT EXISTS daily_weather (
@@ -16,5 +19,8 @@ CREATE TABLE IF NOT EXISTS daily_weather (
     temperature_max DOUBLE PRECISION,
     rainfall DOUBLE PRECISION,
     humidity_avg DOUBLE PRECISION,
-    wind_speed_avg DOUBLE PRECISION
+    wind_speed_avg DOUBLE PRECISION,
+
+    CONSTRAINT uq_daily_weather
+        UNIQUE (date, location)
 );
