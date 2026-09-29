@@ -27,7 +27,7 @@ def transform_world_bank(
                 "indicator_code": (
                     record.get("indicator") or {}
                 ).get("id"),
-                "year": int(record["data"]),
+                "year": int(record["date"]),
                 "value": record.get("value"),
             }
         )
