@@ -4,6 +4,7 @@ import yaml
 
 from clients.world_bank import WorldBankClient
 from clients.open_meteo import OpenMeteoClient
+from storage import MinioStorage
 
 def load_config():
     config_path = Path("config/sources.yml")
@@ -11,7 +12,7 @@ def load_config():
     with config_path.open("r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
-def ingest_world_bank(config):
+def ingest_world_bank(config, storage):
     economic_config = config["economic"]
 
     indicator_codes = [
@@ -43,8 +44,19 @@ def ingest_world_bank(config):
 
     print(f"Raw data saved to: {output_path}")
 
+    object_key = (
+        f"worldbank/{output_path.name}"
+    )
 
-def ingest_open_meteo(config):
+    storage_path = storage.upload_file(
+        str(output_path),
+        object_key,
+    )
+
+    print(f"Uploaded to MinIO: {storage_path}")
+
+
+def ingest_open_meteo(config, storage):
     weather_config = config["weather"]
 
     client = OpenMeteoClient(
@@ -99,11 +111,33 @@ def ingest_open_meteo(config):
         f"Raw weather data saved to: {output_path}"
     )
 
+    object_key = (
+        f"open_meteo/{output_path.name}"
+    )
+
+    storage_path = storage.upload_file(
+        str(output_path),
+        object_key,
+    )
+
+    print(f"Uploaded to MinIO: {storage_path}")
+
 def main():
     config = load_config()
 
-    ingest_world_bank(config)
-    ingest_open_meteo(config)
+    storage = MinioStorage()
+    storage.ensure_bucket()
+
+    ingest_world_bank(
+        config,
+        storage,
+        )
+
+    
+    ingest_open_meteo(
+        config,
+        storage,
+        )
 
 
 if __name__ == "__main__":
