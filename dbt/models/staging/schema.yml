@@ -10,7 +10,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['KEN']
+              values:
+                - KEN
 
       - name: indicator_code
         tests:
@@ -31,7 +32,6 @@ models:
           - not_null
 
       - name: value
-        
 
 
   - name: stg_daily_weather
