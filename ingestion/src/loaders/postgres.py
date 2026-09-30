@@ -127,4 +127,4 @@ class PostgresLoader:
         return inserted
 
     def close(self):
-        self.connection()
+        self.connection.close()
