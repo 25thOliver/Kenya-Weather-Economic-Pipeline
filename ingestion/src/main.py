@@ -183,6 +183,7 @@ def main():
         storage,
         )
 
+    load_processed_data()
 
 if __name__ == "__main__":
     main()
