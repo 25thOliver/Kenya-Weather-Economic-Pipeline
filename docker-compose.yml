@@ -70,6 +70,22 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
 
+  dbt:
+    build:
+      context: ./dbt
+
+    container_name: kenya_pipeline_dbt
+
+    volumes:
+      - ./dbt:/usr/app
+
+    depends_on:
+      - postgres
+
+    environment:
+      DBT_PROFILES_DIR: /usr/app
+
+
 volumes:
   minio_data:
   postgres_data:
