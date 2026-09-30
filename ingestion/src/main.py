@@ -165,7 +165,7 @@ def load_processed_data():
 
     finally:
         loader.close()
-
+        
 def main():
     config = load_config()
 
