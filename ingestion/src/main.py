@@ -5,6 +5,7 @@ import yaml
 from clients.world_bank import WorldBankClient
 from clients.open_meteo import OpenMeteoClient
 from storage import MinioStorage
+from loaders.postgres import PostgresLoader
 
 def load_config():
     config_path = Path("config/sources.yml")
@@ -121,6 +122,49 @@ def ingest_open_meteo(config, storage):
     )
 
     print(f"Uploaded to MinIO: {storage_path}")
+
+
+def load_processed_data():
+    print()
+    print("Starting PostgreSQL loading...")
+
+    loader = PostgresLoader()
+
+    try:
+        economic_path = (
+            "data/processed/worldbank/"
+            "world_bank_clean.json"
+        )
+
+        weather_path = (
+            "data/processed/weather/"
+            "weather_daily.json"
+        )
+
+        economic_inserted = (
+            loader.load_economic_indicators(
+                economic_path
+            )
+        )
+
+        print(
+            f"Economic records inserted: "
+            f"{economic_inserted}"
+        )
+
+        weather_inserted = (
+            loader.load_daily_weather(
+                weather_path
+            )
+        )
+
+        print(
+            f"Weather records inserted: "
+            f"{weather_inserted}"
+        )
+
+    finally:
+        loader.close()
 
 def main():
     config = load_config()
