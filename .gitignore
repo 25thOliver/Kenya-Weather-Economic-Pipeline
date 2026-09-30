@@ -27,3 +27,9 @@ data/processed/*
 
 # Logs
 *.log
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+dbt/profiles.yml
