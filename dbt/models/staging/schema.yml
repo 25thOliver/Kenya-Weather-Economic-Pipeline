@@ -1,0 +1,64 @@
+version: 2
+
+models:
+
+  - name: stg_economic_indicators
+    description: Clean staging model for World Bank economic indicators.
+
+    columns:
+      - name: country_code
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['KEN']
+
+      - name: indicator_code
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - NY.GDP.MKTP.CD
+                - NY.GDP.MKTP.KD.ZG
+                - SP.POP.TOTL
+                - FP.CPI.TOTL
+                - SL.UEM.TOTL.ZS
+                - NV.AGR.TOTL.ZS
+                - EG.ELC.ACCS.ZS
+                - IT.NET.USER.ZS
+
+      - name: year
+        tests:
+          - not_null
+
+      - name: value
+        tests:
+          - not_null
+
+
+  - name: stg_daily_weather
+    description: Daily weather staging model aggregated from Open-Meteo hourly data.
+
+    columns:
+      - name: date
+        tests:
+          - not_null
+
+      - name: location
+        tests:
+          - not_null
+
+      - name: temperature_avg
+        tests:
+          - not_null
+
+      - name: rainfall
+        tests:
+          - not_null
+
+      - name: humidity_avg
+        tests:
+          - not_null
+
+      - name: wind_speed_avg
+        tests:
+          - not_null
