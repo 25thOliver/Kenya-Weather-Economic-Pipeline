@@ -1,89 +1,91 @@
-services:
-
-  ingestion:
+  airflow-init:
     build:
-      context: .
-      dockerfile: ingestion/Dockerfile
+      context: ./airflow
 
-    container_name: kenya_pipeline_ingestion
-
-    restart: "no"
-
-    volumes:
-      - ./data:/app/data
+    container_name: kenya_pipeline_airflow_init
 
     depends_on:
-      - minio
       - postgres
 
     environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+    command:
+      - bash
+      - -c
+      - |
+        airflow db migrate &&
+        airflow users create \
+          --username admin \
+          --firstname Airflow \
+          --lastname Admin \
+          --role Admin \
+          --email admin@example.com \
+          --password admin
+
+
+  airflow-webserver:
+    build:
+      context: ./airflow
+
+    container_name: kenya_pipeline_airflow_webserver
+
+    restart: unless-stopped
+
+    depends_on:
+      - airflow-init
+      - postgres
+      - minio
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: raw-data
 
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-
-  minio:
-    image: minio/minio:latest
-
-    container_name: kenya_pipeline_minio
-
-    restart: unless-stopped
-
-    command: server /data --console-address ":9001"
-
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
     volumes:
-      - minio_data:/data
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./ingestion/src:/opt/airflow/ingestion/src
+      - ./config:/opt/airflow/config
+      - ./data:/opt/airflow/data
+
+    command: webserver
 
 
-  postgres:
-    image: postgres:16
-
-    container_name: kenya_pipeline_postgres
-
-    restart: unless-stopped
-
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-    ports:
-      - "5442:5432"
-
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-
-
-  dbt:
+  airflow-scheduler:
     build:
-      context: ./dbt
+      context: ./airflow
 
-    container_name: kenya_pipeline_dbt
+    container_name: kenya_pipeline_airflow_scheduler
 
-    volumes:
-      - ./dbt:/usr/app
+    restart: unless-stopped
 
     depends_on:
+      - airflow-init
       - postgres
+      - minio
 
     environment:
-      DBT_PROFILES_DIR: /usr/app
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -91,7 +93,17 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: raw-data
 
-volumes:
-  minio_data:
-  postgres_data:
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./ingestion/src:/opt/airflow/ingestion/src
+      - ./config:/opt/airflow/config
+      - ./data:/opt/airflow/data
+
+    command: scheduler
