@@ -1,3 +1,97 @@
+services:
+
+  ingestion:
+    build:
+      context: .
+      dockerfile: ingestion/Dockerfile
+
+    container_name: kenya_pipeline_ingestion
+
+    restart: "no"
+
+    volumes:
+      - ./data:/app/data
+
+    depends_on:
+      - minio
+      - postgres
+
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: raw-data
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+
+  minio:
+    image: minio/minio:latest
+
+    container_name: kenya_pipeline_minio
+
+    restart: unless-stopped
+
+    command: server /data --console-address ":9001"
+
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+    volumes:
+      - minio_data:/data
+
+
+  postgres:
+    image: postgres:16
+
+    container_name: kenya_pipeline_postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5442:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+
+  dbt:
+    build:
+      context: ./dbt
+
+    container_name: kenya_pipeline_dbt
+
+    volumes:
+      - ./dbt:/usr/app
+
+    depends_on:
+      - postgres
+
+    environment:
+      DBT_PROFILES_DIR: /usr/app
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+
   airflow-init:
     build:
       context: ./airflow
@@ -107,3 +201,8 @@
       - ./data:/opt/airflow/data
 
     command: scheduler
+
+
+volumes:
+  minio_data:
+  postgres_data:
