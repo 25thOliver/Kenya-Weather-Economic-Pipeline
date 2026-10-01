@@ -64,7 +64,7 @@ def run_weather_pipeline(config, storage):
 
     raw_path = client.save_raw(
         results,
-        "data/raw.open-meteo",
+        "data/raw/open-meteo",
     )
 
     print(
