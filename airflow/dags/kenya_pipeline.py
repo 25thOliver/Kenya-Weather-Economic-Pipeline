@@ -1,5 +1,6 @@
 from datetime import datetime
 from airflow.decorators import dag, task
+from airflow.operators.bash import BashOperator
 
 @dag(
     dag_id="kenya_economic_weather_pipeline",
@@ -75,6 +76,17 @@ def kenya_eceonomic_weather_pipeline():
     economic = run_economic()
     weather = run_weather()
 
-    [economic, weather] >> laod_database()
+    database = laod_database()
+
+    dbt_build = BashOperator(
+        task_id="dbt_build",
+        bash_command="""
+            cd / app/dbt
+            dbt build
+        """,
+    )
+
+    [economic, weather] >> database
+    database >> dbt_build
 
 kenya_eceonomic_weather_pipeline()
