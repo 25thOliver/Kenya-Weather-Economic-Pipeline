@@ -79,11 +79,17 @@ def kenya_eceonomic_weather_pipeline():
     database = laod_database()
 
     dbt_build = BashOperator(
-        task_id="dbt_build",
-        bash_command="""
-            cd /app/dbt
-            dbt build
-        """,
+    task_id="dbt_build",
+    bash_command="""
+        cd /app/dbt
+
+        mkdir -p /tmp/dbt-logs
+        mkdir -p /tmp/dbt-target
+
+        dbt build \
+            --log-path /tmp/dbt-logs \
+            --target-path /tmp/dbt-target
+    """,
     )
 
     [economic, weather] >> database
