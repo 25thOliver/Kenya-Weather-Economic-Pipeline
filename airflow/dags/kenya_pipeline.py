@@ -81,7 +81,7 @@ def kenya_eceonomic_weather_pipeline():
     dbt_build = BashOperator(
         task_id="dbt_build",
         bash_command="""
-            cd / app/dbt
+            cd /app/dbt
             dbt build
         """,
     )
