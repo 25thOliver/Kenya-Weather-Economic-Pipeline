@@ -141,7 +141,7 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
-      PYTHONPATH: /opt/airflow/ingestion/src
+      PYTHONPATH: /app/src
 
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -154,13 +154,15 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: raw-data
 
+    working_dir: /app
+
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./ingestion/src:/opt/airflow/ingestion/src
-      - ./config:/opt/airflow/config
-      - ./data:/opt/airflow/data
+      - ./ingestion/src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
 
     command: webserver
 
@@ -183,7 +185,7 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
-      PYTHONPATH: /opt/airflow/ingestion/src
+      PYTHONPATH: /app/src
 
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -196,13 +198,15 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: raw-data
 
+    working_dir: /app
+
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./ingestion/src:/opt/airflow/ingestion/src
-      - ./config:/opt/airflow/config
-      - ./data:/opt/airflow/data
+      - ./ingestion/src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
 
     command: scheduler
 
