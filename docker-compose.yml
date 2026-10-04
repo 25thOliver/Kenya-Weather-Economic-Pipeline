@@ -143,6 +143,7 @@ services:
 
       PYTHONPATH: /app/src
 
+      DBT_PROFILES_DIR: /app/dbt
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
@@ -163,6 +164,7 @@ services:
       - ./ingestion/src:/app/src
       - ./config:/app/config
       - ./data:/app/data
+      - ./dbt:/app/dbt
 
     command: webserver
 
@@ -187,6 +189,7 @@ services:
 
       PYTHONPATH: /app/src
 
+      DBT_PROFILES_DIR: /app/dbt
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
@@ -207,6 +210,7 @@ services:
       - ./ingestion/src:/app/src
       - ./config:/app/config
       - ./data:/app/data
+      - ./dbt:/app/dbt
 
     command: scheduler
 
