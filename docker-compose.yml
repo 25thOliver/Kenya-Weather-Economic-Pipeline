@@ -216,7 +216,8 @@ services:
 
 
   superset:
-    image: apache/superset:latest
+    build:
+      context: ./superset
     container_name: kenya_pipeline_superset
     restart: unless-stopped
     depends_on:
@@ -232,7 +233,7 @@ services:
       DATABASE_PORT: 5432
     volumes:
       - superset_data:/app/superset_home
-
+      
 volumes:
   minio_data:
   postgres_data:
