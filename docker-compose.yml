@@ -215,6 +215,25 @@ services:
     command: scheduler
 
 
+  superset:
+    image: apache/superset:latest
+    container_name: kenya_pipeline_superset
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      DATABASE_DB: ${POSTGRES_DB}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+    volumes:
+      - superset_data:/app/superset_home
+
 volumes:
   minio_data:
   postgres_data:
+  superset_data:
