@@ -33,3 +33,6 @@ dbt/target/
 dbt/logs/
 dbt/.user.yml
 dbt/profiles.yml
+
+# Airflow runtime files
+airflow/logs/
