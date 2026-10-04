@@ -1,12 +1,5 @@
-import sys
 from datetime import datetime
 from airflow.decorators import dag, task
-
-
-sys.path.insert(
-    0,
-    "opt/airflow/ingestion/src",
-)
 
 @dag(
     dag_id="kenya_economic_weather_pipeline",
