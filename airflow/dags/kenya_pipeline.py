@@ -21,7 +21,7 @@ def kenya_eceonomic_weather_pipeline():
         )
 
         with Path(
-            "/opt/airflow/config/sources.yml"
+            "/app/config/sources.yml"
         ).open(
             "r",
             encoding="utf-8",
@@ -48,7 +48,7 @@ def kenya_eceonomic_weather_pipeline():
         )
 
         with Path(
-            "/opt/airflow/config/sources.yml"
+            "/app/config/sources.yml"
         ).open(
             "r",
             encoding="utf-8"
