@@ -64,7 +64,7 @@ def run_weather_pipeline(config, storage):
 
     raw_path = client.save_raw(
         results,
-        "data/raw/open-meteo",
+        "/opt/airflow/data/raw/open-meteo",
     )
 
     print(
@@ -86,7 +86,7 @@ def run_weather_pipeline(config, storage):
     )
 
     processed_path = (
-        "data/processed/weather/"
+        "/opt/airflow/data/processed/weather/"
         "weather_daily.json"
     )
 
