@@ -8,6 +8,6 @@ RUN apt-get update \
 
 RUN pip install --no-cache-dir \
     dbt-core==1.9.3 \
-    dbt-postgres==1.9.3
+    dbt-postgres==1.9.1
 
 ENTRYPOINT ["dbt"]
