@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir \
     psycopg2-binary \
     requests \
     dbt-core==1.9.3 \
-    dbt-postgres==1.9.3
+    dbt-postgres==1.9.1
