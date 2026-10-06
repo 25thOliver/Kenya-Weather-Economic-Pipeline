@@ -7,5 +7,6 @@ RUN pip install --no-cache-dir \
     boto3 \
     psycopg2-binary \
     requests \
+    tenacity==9.0.0 \
     dbt-core==1.9.3 \
     dbt-postgres==1.9.1
