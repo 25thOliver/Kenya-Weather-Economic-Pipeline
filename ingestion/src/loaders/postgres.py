@@ -16,11 +16,11 @@ class PostgresLoader:
 
     def load_economic_indicators(
             self,
-            inputh_path: str,
+            input_path: str,
             
     ) -> int:
 
-        input_file = Path(inputh_path)
+        input_file = Path(input_path)
 
         with input_file.open(
             "r",
