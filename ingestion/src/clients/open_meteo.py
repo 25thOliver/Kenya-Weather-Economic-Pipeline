@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import json
 
 import requests
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 class OpenMeteoClient:
@@ -10,6 +11,19 @@ class OpenMeteoClient:
         self.base_url = base_url.rstrip("/")
         self.timezone_name = timezone_name
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=30),
+        reraise=True,
+    )
+    def _get(self, params: dict) -> requests.Response:
+        response = requests.get(
+            self.base_url,
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response
 
     def fetch_location(
             self,
@@ -19,7 +33,7 @@ class OpenMeteoClient:
             variables: list[str],
             start_date: str,
             end_date: str,
-    )  -> dict:
+    ) -> dict:
 
         params = {
             "latitude": latitude,
@@ -30,15 +44,7 @@ class OpenMeteoClient:
             "timezone": self.timezone_name,
         }
 
-        response = requests.get(
-            self.base_url,
-            params=params,
-            timeout=30,
-
-        )
-
-        response.raise_for_status()
-
+        response = self._get(params)
         payload = response.json()
 
         if not isinstance(payload, dict):
@@ -50,7 +56,6 @@ class OpenMeteoClient:
                 "reason",
                 "Unknown Open-Meteo API error",
             )
-
             raise ValueError(
                 f"Open-Meteo error for {name}: {reason}"
             )
@@ -96,8 +101,8 @@ class OpenMeteoClient:
             encoding="utf-8",
         ) as file:
             json.dump(
-                data, 
-                file, 
+                data,
+                file,
                 indent=2,
                 ensure_ascii=False,
             )
