@@ -1,6 +1,7 @@
 from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.operators.bash import BashOperator
+from datetime import datetime, timedelta
 
 @dag(
     dag_id="kenya_economic_weather_pipeline",
@@ -12,7 +13,11 @@ from airflow.operators.bash import BashOperator
 
 def kenya_economic_weather_pipeline():
 
-    @task
+    @task(
+        retries=3,
+        retry_delay=timedelta(minutes=5),
+        retry_exponential_backoff=True,
+    )
     def run_economic():
         from pathlib import Path
         import yaml
@@ -38,7 +43,11 @@ def kenya_economic_weather_pipeline():
             storage,
         )
 
-    @task
+    @task(
+        retries=3,
+        retry_delay=timedelta(minutes=5),
+        retry_exponential_backoff=True,
+    )
     def run_weather():
         from pathlib import Path
         import yaml
@@ -65,7 +74,10 @@ def kenya_economic_weather_pipeline():
             storage,
         )
 
-    @task
+    @task(
+        retries=2,
+        retry_delay=timedelta(minutes=2),
+    )
     def load_database():
         from pipelines.database_pipeline import (
             load_processed_data,
