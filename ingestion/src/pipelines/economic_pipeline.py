@@ -10,7 +10,7 @@ def run_economic_pipeline(config, storage):
         for indicator in economic_config["indicators"]
     ]
 
-    print("Starting World Bankk Pipeline...")
+    print("Starting World Bank Pipeline...")
     print(
         f"Country: "
         f"{economic_config['country_code']}"
