@@ -49,8 +49,11 @@ class PostgresLoader:
                         indicator_code,
                         year
                     )
-                    DO NOTHING
+                    DO UPDATE SET
+                        value = EXCLUDED.value,
+                        country = EXCLUDED.country
                     """,
+
                     (
                         record["country_code"],
                         record["country"],
