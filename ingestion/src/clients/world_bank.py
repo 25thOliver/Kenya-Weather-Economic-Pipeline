@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 import requests
-
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 class WorldBankClient:
     def __init__(self, base_url: str, country_code: str):
