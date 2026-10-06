@@ -36,8 +36,9 @@ def run_economic_pipeline(config, storage):
 
     raw_path = client.save_raw(
         data,
-        "/opt/airflow/data/raw/worldbank",
+        "/app/data/raw/worldbank",
     )
+
 
     print(f"Raw data saved to: {raw_path}")
 
@@ -51,10 +52,10 @@ def run_economic_pipeline(config, storage):
     )
 
     processed_path = (
-        "/opt/airflow/data/processed/worldbank/"
+        "/app/data/processed/worldbank/"
         "world_bank_clean.json"
-
     )
+
 
     transform_world_bank(
         str(raw_path),
