@@ -9,6 +9,16 @@ class WorldBankClient:
         self.base_url = base_url.rstrip("/")
         self.country_code = country_code
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=30),
+        reraise=True,
+    )
+    def _get(self, url: str, params: dict) -> requests.Response:
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        return response
+
     def fetch_indicators(self, indicator_codes: list[str]) -> dict:
         all_records = []
         indicator_metadata = []
@@ -23,26 +33,33 @@ class WorldBankClient:
             params = {
                 "format": "json",
                 "per_page": 1000,
+                "page": 1,
             }
 
-            response = requests.get(
-                url,
-                params=params,
-                timeout=30,
-            )
+            # --- pagination loop (H3) ---
+            while True:
+                response = self._get(url, params)
+                payload = response.json()
 
-            response.raise_for_status()
+                if not isinstance(payload, list) or len(payload) != 2:
+                    raise ValueError(
+                        f"Unexpected World Bank response for "
+                        f"{indicator_code}: {payload}"
+                    )
 
-            payload = response.json()
+                metadata = payload[0]
+                records = payload[1]
 
-            if not isinstance(payload, list) or len(payload) != 2:
-                raise ValueError(
-                    f"Unexpected World Bank response for "
-                    f"{indicator_code}: {payload}"
-                )
+                if records:
+                    all_records.extend(records)
 
-            metadata = payload[0]
-            records = payload[1]
+                total_pages = metadata.get("pages", 1)
+                current_page = metadata.get("page", 1)
+
+                if current_page >= total_pages:
+                    break
+
+                params["page"] += 1
 
             indicator_metadata.append({
                 "indicator": indicator_code,
@@ -50,11 +67,9 @@ class WorldBankClient:
                 "request_url": response.url,
             })
 
-            all_records.extend(records)
-
             print(
                 f"  {indicator_code}: "
-                f"{len(records)} records"
+                f"{len(records)} records fetched"
             )
 
         return {
