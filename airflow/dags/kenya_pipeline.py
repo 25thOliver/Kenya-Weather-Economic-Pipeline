@@ -10,7 +10,7 @@ from airflow.operators.bash import BashOperator
     tags=["kenya", "data-engineering"],
 )
 
-def kenya_eceonomic_weather_pipeline():
+def kenya_economic_weather_pipeline():
 
     @task
     def run_economic():
@@ -66,7 +66,7 @@ def kenya_eceonomic_weather_pipeline():
         )
 
     @task
-    def laod_database():
+    def load_database():
         from pipelines.database_pipeline import (
             load_processed_data,
         )
@@ -76,7 +76,7 @@ def kenya_eceonomic_weather_pipeline():
     economic = run_economic()
     weather = run_weather()
 
-    database = laod_database()
+    database = load_database()
 
     dbt_build = BashOperator(
     task_id="dbt_build",
@@ -95,4 +95,4 @@ def kenya_eceonomic_weather_pipeline():
     [economic, weather] >> database
     database >> dbt_build
 
-kenya_eceonomic_weather_pipeline()
+kenya_economic_weather_pipeline()
