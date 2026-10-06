@@ -8,14 +8,15 @@ def load_processed_data():
 
     try:
         economic_path = (
-            "data/processed/worldbank/"
+            "/app/data/processed/worldbank/"
             "world_bank_clean.json"
         )
 
         weather_path = (
-            "data/processed/weather/"
+            "/app/data/processed/weather/"
             "weather_daily.json"
         )
+
 
         economic_inserted = (
             loader.load_economic_indicators(
