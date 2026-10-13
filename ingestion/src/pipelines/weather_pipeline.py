@@ -1,5 +1,8 @@
+import logging
 from clients.open_meteo import OpenMeteoClient
 from transformers.weather import transform_weather
+
+logger = logging.getLogger(__name__)
 
 
 def run_weather_pipeline(config, storage):
@@ -11,31 +14,19 @@ def run_weather_pipeline(config, storage):
     )
 
     variables = weather_config["variables"]
-
     start_date = "2025-01-01"
-    end_date = "2025-01-07"
+    end_date = "2025-12-31"
 
+    logger.info("Starting Open-Meteo pipeline...")
+    logger.info("Locations: %d", len(weather_config["locations"]))
+    logger.info("Variables: %d", len(variables))
+    logger.info("Date range: %s to %s", start_date, end_date)
 
     results = []
 
-    print()
-    print("Starting Open-Meteo pipeline...")
-    print(
-        f"Locations: "
-        f"{len(weather_config['locations'])}"
-    )
-    print(
-        f"Variables: {len(variables)}"
-    )
-    print(
-        f"Data range: "
-        f"{start_date} to {end_date}"
-    )
-
     for location in weather_config["locations"]:
         name = location["name"]
-
-        print(f"  Fetching {name}...")
+        logger.info("Fetching %s...", name)
 
         result = client.fetch_location(
             name=name,
@@ -48,58 +39,29 @@ def run_weather_pipeline(config, storage):
 
         results.append(result)
 
-        hourly = result["data"].get(
-            "hourly",
-            {},
-        )
-
-        timestamps = hourly.get(
-            "time",
-            [],
-        )
-
-        print(
-            f"   {len(timestamps)} hourly records"
-        )
+        timestamps = result["data"].get("hourly", {}).get("time", [])
+        logger.info("  %s: %d hourly records", name, len(timestamps))
 
     raw_path = client.save_raw(
         results,
         "/app/data/raw/open-meteo",
     )
 
+    logger.info("Raw weather data saved to: %s", raw_path)
 
-    print(
-        f"Raw weather data saved to: "
-        f"{raw_path}"
-    )
+    object_key = f"open-meteo/{raw_path.name}"
 
-    object_key = (
-        f"open-meteo/{raw_path.name}"
-    )
+    storage_path = storage.upload_file(str(raw_path), object_key)
 
-    storage_path = storage.upload_file(
-        str(raw_path),
-        object_key,
-    )
-
-    print(
-        f"Uploaded to MinIO: {storage_path}"
-    )
+    logger.info("Uploaded to MinIO: %s", storage_path)
 
     processed_path = (
         "/app/data/processed/weather/"
         "weather_daily.json"
     )
 
+    transform_weather(str(raw_path), processed_path)
 
-    transform_weather(
-        str(raw_path),
-        processed_path,
-    )
-
-    print(
-        f"Processed data saved to: "
-        f"{processed_path}"
-    )
+    logger.info("Processed data saved to: %s", processed_path)
 
     return processed_path
