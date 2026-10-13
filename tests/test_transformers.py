@@ -7,8 +7,8 @@ import json
 import tempfile
 from pathlib import Path
 
-from transformers.weather import transform_weather
-from transformers.world_bank import transform_world_bank
+from pipeline_transformers.weather import transform_weather
+from pipeline_transformers.world_bank import transform_world_bank
 
 
 # Helpers

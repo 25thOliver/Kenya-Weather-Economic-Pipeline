@@ -1,6 +1,6 @@
 import logging
 from clients.open_meteo import OpenMeteoClient
-from transformers.weather import transform_weather
+from pipeline_transformers.weather import transform_weather
 
 logger = logging.getLogger(__name__)
 

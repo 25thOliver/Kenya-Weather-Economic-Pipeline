@@ -1,6 +1,6 @@
 import logging
 from clients.world_bank import WorldBankClient
-from transformers.world_bank import transform_world_bank
+from pipeline_transformers.world_bank import transform_world_bank
 
 logger = logging.getLogger(__name__)
 
