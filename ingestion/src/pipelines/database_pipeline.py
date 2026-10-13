@@ -1,8 +1,11 @@
+import logging
 from loaders.postgres import PostgresLoader
 
+logger = logging.getLogger(__name__)
+
+
 def load_processed_data():
-    print()
-    print("Starting PostgreSQL loading...")
+    logger.info("Starting PostgreSQL loading...")
 
     loader = PostgresLoader()
 
@@ -17,28 +20,25 @@ def load_processed_data():
             "weather_daily.json"
         )
 
+        economic_inserted = loader.load_economic_indicators(
+            economic_path
+        )
+        logger.info("Economic records inserted: %d", economic_inserted)
 
-        economic_inserted = (
-            loader.load_economic_indicators(
-                economic_path
+        weather_inserted = loader.load_daily_weather(weather_path)
+        logger.info("Weather records inserted: %d", weather_inserted)
+
+        if economic_inserted == 0:
+            logger.warning(
+                "No economic records inserted — "
+                "all rows may already exist or data may be empty."
             )
-        )
 
-        print(
-            f"Economic records inserted: "
-            f"{economic_inserted}"
-        )
-
-        weather_inserted = (
-            loader.load_daily_weather(
-                weather_path
+        if weather_inserted == 0:
+            logger.warning(
+                "No weather records inserted — "
+                "all rows may already exist or data may be empty."
             )
-        )
-
-        print(
-            f"Weather records inserted: "
-            f"{weather_inserted}"
-        )
 
         return {
             "economic_inserted": economic_inserted,
