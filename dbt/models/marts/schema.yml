@@ -1,0 +1,61 @@
+version: 2
+
+models:
+
+  - name: dim_location
+    description: >
+      Static dimension table of the 6 Kenyan cities monitored
+      by this pipeline. Includes coordinates, county, and region.
+    columns:
+      - name: location
+        description: City name (primary key).
+        tests:
+          - unique
+          - not_null
+      - name: latitude
+        tests:
+          - not_null
+      - name: longitude
+        tests:
+          - not_null
+      - name: county
+        tests:
+          - not_null
+      - name: region
+        tests:
+          - not_null
+
+  - name: fct_daily_climate
+    description: >
+      Enriched daily weather observations joined to location dimension.
+      One row per city per day. Adds derived columns for Superset dashboards.
+    columns:
+      - name: date
+        tests:
+          - not_null
+      - name: location
+        tests:
+          - not_null
+      - name: rainfall_category
+        tests:
+          - not_null
+          - accepted_values:
+              values: [dry, light, moderate, heavy]
+
+  - name: fct_economic_snapshot
+    description: >
+      Annual World Bank economic indicators for Kenya with year-over-year
+      percentage change. One row per indicator per year.
+    columns:
+      - name: year
+        tests:
+          - not_null
+      - name: indicator_code
+        tests:
+          - not_null
+      - name: indicator_name
+        tests:
+          - not_null
+      - name: value
+        tests:
+          - not_null
