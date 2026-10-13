@@ -16,3 +16,7 @@ models:
   kenya_economic_weather:
     staging:
       +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
