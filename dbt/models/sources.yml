@@ -3,6 +3,25 @@ version: 2
 sources:
   - name: postgres
     schema: public
+    description: Raw tables loaded by the Python ingestion pipeline.
+
+    freshness:
+      warn_after: {count: 25, period: hour}
+      error_after: {count: 49, period: hour}
+
+    loaded_at_field: null
+
     tables:
       - name: economic_indicators
+        description: >
+          World Bank annual economic indicators for Kenya.
+          Upserted by the ingestion pipeline on each run.
+
       - name: daily_weather
+        description: >
+          Daily aggregated weather observations for 6 Kenyan cities,
+          derived from Open-Meteo hourly archive data.
+        loaded_at_field: date
+        freshness:
+          warn_after: {count: 2, period: day}
+          error_after: {count: 7, period: day}
