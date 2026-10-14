@@ -42,16 +42,18 @@ SELECT
 
     ROUND(
         (
-            (value - LAG(value) OVER (
-                PARTITION BY indicator_code ORDER BY year
-            ))
-            / NULLIF(
-                ABS(LAG(value) OVER (
+            (
+                (value - LAG(value) OVER (
                     PARTITION BY indicator_code ORDER BY year
-                )),
-                0
-            )
-        ) * 100,
+                ))
+                / NULLIF(
+                    ABS(LAG(value) OVER (
+                        PARTITION BY indicator_code ORDER BY year
+                    )),
+                    0
+                )
+            ) * 100
+        )::numeric,
         2
     )                                                   AS yoy_change_pct
 
