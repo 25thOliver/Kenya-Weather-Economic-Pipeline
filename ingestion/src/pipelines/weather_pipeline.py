@@ -30,7 +30,7 @@ def run_weather_pipeline(config, storage, watermark_manager=None):
 
     variables = weather_config["variables"]
 
-    # --- Compute date window -------------------------------------------
+    # Compute date window
     end_date = date.today() - timedelta(days=ARCHIVE_LAG_DAYS)
 
     if watermark_manager is not None:
