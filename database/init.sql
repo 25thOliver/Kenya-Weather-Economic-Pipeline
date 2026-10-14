@@ -24,3 +24,10 @@ CREATE TABLE IF NOT EXISTS daily_weather (
     CONSTRAINT uq_daily_weather
         UNIQUE (date, location)
 );
+
+CREATE TABLE IF NOT EXISTS pipeline_watermarks (
+    pipeline_name    VARCHAR(100) PRIMARY KEY,
+    last_successful_date DATE NOT NULL,
+    last_run_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    records_loaded   INTEGER NOT NULL DEFAULT 0
+);
