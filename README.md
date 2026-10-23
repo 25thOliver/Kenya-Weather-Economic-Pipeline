@@ -19,3 +19,7 @@ Built as a portfolio project demonstrating real-world data engineering practices
 | **Visualise** | Apache Superset dashboards query the mart layer |
 
 ---
+
+## Architecture
+
+Open-Meteo API World Bank API │ │ ▼ ▼ Python Clients ──────────────────────────▶ MinIO (tenacity retry) Raw JSON (raw-data bucket) │ │ ▼ ▼ Transformers (hourly→daily agg / flatten) │ │ └───────────┬───────────┘ ▼ PostgreSQL (public schema) ┌──────────────────────────┐ │ economic_indicators │ │ daily_weather │ │ pipeline_watermarks │ └──────────────────────────┘ │ ▼ dbt (analytics schema) ┌──────────────────────────┐ │ staging views │ │ marts tables │ │ dim_location │ │ fct_daily_climate │ │ fct_economic_snapshot │ └──────────────────────────┘ │ ▼ Apache Superset
