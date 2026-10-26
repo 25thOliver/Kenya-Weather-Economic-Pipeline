@@ -5,6 +5,18 @@ import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 class WorldBankClient:
+    """
+    Client for the World Bank Indicators REST API (v2).
+
+    Fetches annual economic indicator time-series for a given country.
+    Handles multi-page responses automatically and retries transient
+    HTTP errors with exponential back-off via tenacity.
+
+    Args:
+        base_url: Root API URL, e.g. 'https://api.worldbank.org/v2'
+        country_code: ISO3 country code, e.g. 'KEN'
+    """
+
     def __init__(self, base_url: str, country_code: str):
         self.base_url = base_url.rstrip("/")
         self.country_code = country_code
@@ -36,7 +48,7 @@ class WorldBankClient:
                 "page": 1,
             }
 
-            # --- pagination loop (H3) ---
+            # pagination loop
             while True:
                 response = self._get(url, params)
                 payload = response.json()
