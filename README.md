@@ -20,9 +20,76 @@ Built as a portfolio project demonstrating real-world data engineering practices
 
 ---
 
+
 ## Architecture
 
-Open-Meteo API World Bank API │ │ ▼ ▼ Python Clients ──────────────────────────▶ MinIO (tenacity retry) Raw JSON (raw-data bucket) │ │ ▼ ▼ Transformers (hourly→daily agg / flatten) │ │ └───────────┬───────────┘ ▼ PostgreSQL (public schema) ┌──────────────────────────┐ │ economic_indicators │ │ daily_weather │ │ pipeline_watermarks │ └──────────────────────────┘ │ ▼ dbt (analytics schema) ┌──────────────────────────┐ │ staging views │ │ marts tables │ │ dim_location │ │ fct_daily_climate │ │ fct_economic_snapshot │ └──────────────────────────┘ │ ▼ Apache Superset
+```mermaid
+flowchart TD
+    subgraph Sources["Data Sources"]
+        OM["Open-Meteo API"]
+        WB["World Bank API"]
+    end
+
+    subgraph Ingestion["Ingestion Layer · Python"]
+        CLIENTS["Python API Clients"]
+        RETRY["Tenacity Retry Logic"]
+        TRANSFORM["Transformers<br/>Hourly → Daily Aggregation<br/>JSON Flattening"]
+    end
+
+    subgraph Storage["Raw Storage · MinIO"]
+        RAW[("raw-data Bucket<br/>Raw JSON")]
+    end
+
+    subgraph Warehouse["Data Warehouse · PostgreSQL"]
+        direction TB
+        PUBLIC["public schema"]
+        ECON[("economic_indicators")]
+        WEATHER[("daily_weather")]
+        WATERMARK[("pipeline_watermarks")]
+    end
+
+    subgraph Analytics["Transformation Layer · dbt"]
+        STAGING["analytics schema<br/>Staging Views"]
+        MARTS["Analytics Marts"]
+        LOC[("dim_location")]
+        CLIMATE[("fct_daily_climate")]
+        SNAPSHOT[("fct_economic_snapshot")]
+    end
+
+    BI["Apache Superset"]
+
+    OM --> CLIENTS
+    WB --> CLIENTS
+    CLIENTS --> RETRY
+    RETRY --> RAW
+    RAW --> TRANSFORM
+    TRANSFORM --> PUBLIC
+
+    PUBLIC --- ECON
+    PUBLIC --- WEATHER
+    PUBLIC --- WATERMARK
+
+    PUBLIC --> STAGING
+    STAGING --> MARTS
+    MARTS --- LOC
+    MARTS --- CLIMATE
+    MARTS --- SNAPSHOT
+
+    MARTS --> BI
+
+    classDef source fill:#e8f1ff,stroke:#3973ac,color:#172b4d
+    classDef ingestion fill:#fff1d6,stroke:#c58b24,color:#533800
+    classDef storage fill:#e4f5e9,stroke:#388e5b,color:#174b2b
+    classDef analytics fill:#f0e8ff,stroke:#8056b3,color:#39205b
+    classDef visualization fill:#ffe7e7,stroke:#c44d4d,color:#5b2020
+
+    class OM,WB source
+    class CLIENTS,RETRY,TRANSFORM ingestion
+    class RAW,ECON,WEATHER,WATERMARK storage
+    class STAGING,MARTS,LOC,CLIMATE,SNAPSHOT analytics
+    class BI visualization
+```
+
 
 ---
 
