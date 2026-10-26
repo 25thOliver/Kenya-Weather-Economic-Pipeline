@@ -7,6 +7,17 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 class OpenMeteoClient:
+    """
+    Client for the Open-Meteo Historical Weather Archive API.
+
+    Fetches hourly weather variables for a geographic coordinate.
+    Retries transient HTTP errors with exponential back-off.
+
+    Args:
+        base_url: Archive API endpoint
+        timezone_name: IANA timezone, e.g. 'Africa/Nairobi'
+    """
+
     def __init__(self, base_url: str, timezone_name: str):
         self.base_url = base_url.rstrip("/")
         self.timezone_name = timezone_name
