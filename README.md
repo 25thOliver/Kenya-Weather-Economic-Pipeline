@@ -78,7 +78,7 @@ Nairobi · Mombasa · Kisumu · Nakuru · Eldoret · Garissa
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/25thOliver/kenya-economic-weather-pipeline.git
+git clone https://github.com/25thOliver/Kenya-Weather-Economic-Pipeline
 cd kenya-economic-weather-pipeline
 cp .env.example .env
 # Edit .env and set strong passwords before continuing
