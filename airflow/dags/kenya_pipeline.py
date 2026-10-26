@@ -82,6 +82,18 @@ def kenya_economic_weather_pipeline():
     # Pass weather result directly into load_database via XCom
     database = load_database(economic, weather)
 
+    dbt_build = BashOperator(
+        task_id="dbt_build",
+        bash_command="""
+            cd /app/dbt
+            mkdir -p /tmp/dbt-logs
+            mkdir -p /tmp/dbt-target
+            dbt build \
+                --log-path /tmp/dbt-logs \
+                --target-path /tmp/dbt-target
+        """,
+    )
+
     dbt_docs = BashOperator(
         task_id="dbt_docs_generate",
         bash_command="""
@@ -92,8 +104,8 @@ def kenya_economic_weather_pipeline():
         """,
     )
 
-
     database >> dbt_build >> dbt_docs
+
 
 
 kenya_economic_weather_pipeline()
