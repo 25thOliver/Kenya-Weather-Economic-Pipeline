@@ -93,7 +93,7 @@ def kenya_economic_weather_pipeline():
     )
 
 
-    database >> dbt_build
+    database >> dbt_build >> dbt_docs
 
 
 kenya_economic_weather_pipeline()
