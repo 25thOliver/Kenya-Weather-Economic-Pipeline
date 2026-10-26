@@ -5,17 +5,6 @@ from pathlib import Path
 import psycopg2
 
 class PostgresLoader:
-    """
-    Loads processed JSON records into PostgreSQL using upsert semantics.
-
-    Uses ON CONFLICT DO NOTHING for weather (observations are immutable)
-    and ON CONFLICT DO UPDATE for economic indicators (World Bank revises
-    historical values annually).
-
-    Reads connection parameters from environment variables:
-    POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
-    """
-
     def __init__(self):
         self.connection = psycopg2.connect(
             host=os.environ["POSTGRES_HOST"],
