@@ -5,6 +5,15 @@ from botocore.client import Config
 
 
 class MinioStorage:
+    """
+    Uploads raw data files to a MinIO bucket using the S3-compatible API.
+
+    Reads connection parameters from environment variables:
+    MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_BUCKET
+
+    The bucket is created automatically on first use if it does not exist.
+    """
+
     def __init__(self):
         endpoint = os.environ["MINIO_ENDPOINT"]
         access_key = os.environ["MINIO_ACCESS_KEY"]
